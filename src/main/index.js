@@ -34,11 +34,30 @@ function createWindow () {
   // titleBarStyle: 'hidden'
   })
 
+  mainWindow.setAlwaysOnTop(true, 'floating')
+  mainWindow.setVisibleOnAllWorkspaces(true)
+  mainWindow.setFullScreenable(false)
   mainWindow.loadURL(winURL)
-
   mainWindow.on('closed', () => {
     mainWindow = null
   })
+  mainWindow.on('blur', () => {
+    mainWindow.hide()
+  })
+}
+
+const mainHotkey = 'CommandOrControl+Shift+b'
+
+app.dock.hide()
+app.on('ready', () => {
+  createWindow()
+
+  let ret = globalShortcut.register(mainHotkey, () => {
+    onMainPressed()
+  })
+  if (!ret || !globalShortcut.isRegistered(mainHotkey)) {
+    console.error('failed to register')
+  }
 
   ipcMain.on('search', (event, arg) => {
     doSearch(arg)
@@ -57,20 +76,6 @@ function createWindow () {
       })
     })
   })
-}
-
-const mainHotkey = 'CommandOrControl+Shift+b'
-
-app.dock.hide()
-app.on('ready', () => {
-  createWindow()
-
-  let ret = globalShortcut.register(mainHotkey, () => {
-    onMainPressed()
-  })
-  if (!ret || !globalShortcut.isRegistered(mainHotkey)) {
-    console.error('failed to register')
-  }
 })
 
 app.on('window-all-closed', () => {
@@ -105,7 +110,6 @@ exClip.on('text-changed', () => {
 function updateDocsOnRender () {
   db.find({}).sort({dt: -1}).limit(20).exec((err, docs) => {
     if (err) {
-      console.error(err)
       sendDocsToRender([])
       return
     }
@@ -172,6 +176,7 @@ function onMainPressed () {
   if (mainWindow.isVisible()) {
     mainWindow.hide()
   } else {
+    updateDocsOnRender()
     saveWindowBeforeActive((result) => {
       lastWindow = result
       mainWindow.show()

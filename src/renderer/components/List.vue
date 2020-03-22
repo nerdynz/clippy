@@ -1,7 +1,7 @@
 <template>
   <div class="list">
     <div :class="{'list-item': true, 'is-selected': index===selectedIndex}" v-for="(item, index) in items" :key="item._id">
-      {{item.text}}
+      {{ substring(item.text) }}
     </div>
   </div>
 </template>
@@ -17,6 +17,18 @@ export default {
   },
   computed: {},
   methods: {
+    substring (text) {
+      text = (text + '')
+      let spl = text.split('\n')
+      if (spl.length > 0) {
+        text = spl[0]
+      }
+      text = text.substring(0, 40)
+      if (text.length >= 40) {
+        text += '...'
+      }
+      return text
+    },
     handleKeys (ev) {
       this.$emit('keydown', ev)
     }

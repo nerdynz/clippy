@@ -1,5 +1,6 @@
 <template>
   <div class="selected-text">
+    <div v-html="formattedText.html" />
   </div>
 </template>
 

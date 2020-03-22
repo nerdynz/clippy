@@ -38,7 +38,9 @@ export default {
     handleKeys (ev) {
       console.log(ev)
       if (ev.key === 'Enter') {
+        ev.preventDefault()
         ipcRenderer.send('insert', this.current)
+        return
       }
       if (ev.key === 'ArrowUp') {
         ev.preventDefault()
@@ -86,6 +88,7 @@ export default {
   },
   mounted () {
     this.$refs.searcher.focus()
+    this.selectedIndex = 0
   },
   beforeUpdate () {
   },
@@ -129,7 +132,7 @@ export default {
           text-overflow: ellipsis;
           overflow: hidden;
           border-bottom: 1px solid #efefef;
-          height: 30px;
+          height: 40px;
 
           &.is-selected {
             background-color: blue;
